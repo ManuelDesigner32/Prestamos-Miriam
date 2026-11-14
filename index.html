@@ -126,9 +126,9 @@ textarea{height:90px;font:12px monospace;margin:8px 0}
 
 <details>
   <summary>Respaldo de datos</summary>
-  <p class="meta">Tus préstamos se guardan en Firebase y se comparten con quien tenga el código de acceso. El enlace de acceso incluye el código: pásalo solo a la otra persona. Para traer datos de otra versión, pega aquí su respaldo y toca Restaurar.</p>
+  <p class="meta">Tus préstamos se guardan en línea. Para traer datos de otra versión, pega aquí su respaldo y toca Restaurar.</p>
   <textarea id="bk" placeholder="Respaldo (JSON)"></textarea>
-  <button id="bkGet">Generar respaldo</button> <button id="bkSet">Restaurar</button> <button id="lkBtn">Copiar enlace de acceso</button>
+  <button id="bkGet">Generar respaldo</button> <button id="bkSet">Restaurar</button>
 </details>
 </main>
 
@@ -145,6 +145,7 @@ textarea{height:90px;font:12px monospace;margin:8px 0}
 <script>
 /* ⚙️ PEGA AQUÍ tu configuración de Firebase (Configuración del proyecto → Tus apps → Web → firebaseConfig) */
 const FIREBASE_CONFIG={apiKey:"AIzaSyCwFbrPs7u7sf6m46J_dAzjwppCQ_huvHo",authDomain:"prestamos-miriam.firebaseapp.com",projectId:"prestamos-miriam",storageBucket:"prestamos-miriam.firebasestorage.app",messagingSenderId:"175703767286",appId:"1:175703767286:web:fb93a294f6ae1c01bd54d7"};
+const ACCESS_CODE='sta956evct4k7ydmq2ce4uys';
 const KEY='prestamos_v1',MIG='prestamos_migrado_v1';
 let loans=[],tab='todos',q='',editId=null,col=null,online=false,ready=false,migTried=false,onYes=null,tzT=null,errState=false;
 const $=id=>document.getElementById(id);
@@ -163,7 +164,7 @@ const done=l=>l.cuotas.every(c=>c.pagado);
 /* ---------- Estado y guardado (Firebase) ---------- */
 const CODE_KEY='prestamos_codigo_v1',CODE_RE=/^[A-Za-z0-9_-]{12,60}$/;
 function setSt(k){
-  const m={wait:['wait','⏳ Conectando…'],on:['on','☁️ Guardado en línea y compartido con quien tenga el código de acceso'],slow:['off','⚠️ Todavía no hay conexión con Firebase; esperando…'],err:['off','⚠️ Sin conexión con Firebase. Recarga la página.']};
+  const m={wait:['wait','⏳ Conectando…'],on:['on','☁️ Guardado en línea'],slow:['off','⚠️ Todavía no hay conexión con Firebase; esperando…'],err:['off','⚠️ Sin conexión con Firebase. Recarga la página.']};
   const s=$('st');s.className='st '+m[k][0];s.textContent=m[k][1];
 }
 function toast(t){const e=$('tz');e.textContent=t;e.style.display='block';clearTimeout(tzT);tzT=setTimeout(()=>{e.style.display='none'},4500);}
@@ -209,12 +210,6 @@ $('gOk').onclick=()=>{
   if(!CODE_RE.test(c)){$('gMsg').textContent='El código debe tener entre 12 y 60 caracteres: letras, números, guion o guion bajo.';return;}
   setCode(c);$('gate').style.display='none';startDb(c);
 };
-$('lkBtn').onclick=()=>{
-  const c=getCode();if(!c){toast('Todavía no hay un código de acceso en este dispositivo.');return;}
-  $('bk').value=location.origin+location.pathname+'#'+c;$('bk').select();
-  try{navigator.clipboard.writeText($('bk').value)}catch(e){}
-  toast('Enlace de acceso listo: pásalo solo a la otra persona.');
-};
 
 /* ---------- Conexión ---------- */
 function toLocal(msg){online=false;col=null;loans=[];ready=false;errState=true;setSt('err');render();if(msg)toast(msg);}
@@ -234,11 +229,7 @@ function startDb(code){
 function init(){
   if(!FIREBASE_CONFIG.projectId){toLocal('Falta la configuración de Firebase.');return;}
   if(typeof firebase==='undefined'){toLocal('No se pudo cargar Firebase. Revisa tu conexión.');return;}
-  const hs=location.hash.slice(1);
-  if(CODE_RE.test(hs)){setCode(hs);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
-  const code=getCode();
-  if(!code){openGate();return;}
-  startDb(code);
+  startDb(ACCESS_CODE);
 }
 
 /* ---------- Formulario ---------- */

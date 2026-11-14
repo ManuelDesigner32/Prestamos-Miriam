@@ -382,31 +382,33 @@ function paintReceipt(c,H,l){
   let px=56;do{c.font='800 '+px+'px '+FNT;px-=2;}while(c.measureText(l.persona).width>IW&&px>26);
   c.fillText(l.persona,M,y);
   y+=64;
-  const rows=[['Monto prestado',fmt(l.monto)],['Interés ('+l.pct+'%)',fmt(l.total-l.monto)],['Total a pagar',fmt(l.total)],['Fecha del préstamo',show(l.fprestamo)]];
-  rows.forEach((r,i)=>{
-    const hi=i===2;
+  const row=(k,v,hi,sub,subCol)=>{
     if(hi){c.fillStyle='#ddd0f6';rrect(c,M-20,y-44,IW+40,66,16);c.fill();}
-    c.textAlign='left';c.fillStyle=hi?'#4a2d8a':'#54476e';c.font=(hi?'700':'500')+' 30px '+FNT;c.fillText(r[0],M,y);
-    c.textAlign='right';c.fillStyle=hi?'#4a2d8a':'#241a38';c.font='700 32px '+FNT;c.fillText(plain(r[1]),W-M,y);
-    y+=72;
-  });
-  y+=6;c.fillStyle='#e3d8f4';c.fillRect(M,y-30,IW,3);
-  y+=34;c.textAlign='left';c.fillStyle='#8a78b5';c.font='700 26px '+FNT;c.fillText(multi?'FECHAS DE PAGO':'FECHA DE PAGO',M,y);
-  y+=58;
-  l.cuotas.forEach((q,i)=>{
-    c.textAlign='left';c.fillStyle='#241a38';c.font='600 30px '+FNT;
-    c.fillText(plain((multi?'Cuota '+(i+1)+' · ':'')+show(q.fecha)),M,y);
-    c.textAlign='right';c.font='700 32px '+FNT;c.fillText(plain(fmt(q.monto)),W-M,y);
-    const st=q.pagado?['Pagada','#17613b']:dd(q.fecha)<0?['Vencida','#9a1f3d']:['Pendiente','#8a6500'];
-    c.textAlign='left';c.fillStyle=st[1];c.font='700 24px '+FNT;c.fillText(st[0],M,y+34);
-    y+=86;
-  });
-  y+=2;c.fillStyle='#e3d8f4';c.fillRect(M,y-34,IW,3);
-  [['Pagado hasta hoy',fmt(pagado),false],['Saldo pendiente',fmt(saldo),true]].forEach(r=>{
-    c.textAlign='left';c.fillStyle=r[2]?'#4a2d8a':'#54476e';c.font=(r[2]?'700':'500')+' 30px '+FNT;c.fillText(r[0],M,y+6);
-    c.textAlign='right';c.fillStyle=r[2]?'#4a2d8a':'#241a38';c.font='700 34px '+FNT;c.fillText(plain(r[1]),W-M,y+6);
-    y+=70;
-  });
+    c.textAlign='left';c.fillStyle=hi?'#4a2d8a':'#54476e';c.font=(hi?'700':'500')+' 30px '+FNT;c.fillText(k,M,y);
+    c.textAlign='right';c.fillStyle=hi?'#4a2d8a':'#241a38';c.font='700 32px '+FNT;c.fillText(plain(v),W-M,y);
+    if(sub){c.textAlign='left';c.fillStyle=subCol;c.font='700 24px '+FNT;c.fillText(sub,M,y+34);}
+    y+=sub?86:72;
+  };
+  const line=()=>{y+=6;c.fillStyle='#e3d8f4';c.fillRect(M,y-30,IW,3);y+=24;};
+  const stOf=q=>q.pagado?['Pagada','#17613b']:dd(q.fecha)<0?['Vencida','#9a1f3d']:['Pendiente','#8a6500'];
+  if(!multi){
+    const q=l.cuotas[0],st=stOf(q);
+    row('Monto prestado',fmt(l.monto));
+    row('Interés ('+l.pct+'%)',fmt(l.total-l.monto));
+    row('Fecha del préstamo',show(l.fprestamo));
+    line();
+    row('Total a pagar',fmt(l.total),true);
+    row('Fecha de pago',show(q.fecha),false,st[0],st[1]);
+  }else{
+    row('Monto prestado',fmt(l.monto));
+    row('Interés ('+l.pct+'%)',fmt(l.total-l.monto));
+    row('Total a pagar',fmt(l.total),true);
+    row('Fecha del préstamo',show(l.fprestamo));
+    line();
+    c.textAlign='left';c.fillStyle='#8a78b5';c.font='700 26px '+FNT;c.fillText('FECHAS DE PAGO',M,y);y+=58;
+    l.cuotas.forEach((q,i)=>{const st=stOf(q);row('Cuota '+(i+1)+' · '+show(q.fecha),fmt(q.monto),false,st[0],st[1]);});
+    if(pagado>0&&saldo>0){line();row('Saldo pendiente',fmt(saldo),true);}
+  }
   y+=20;c.textAlign='center';c.fillStyle='#9a8fb0';c.font='500 22px '+FNT;c.fillText('Generado el '+plain(show(today)),W/2,y);
   return y+70;
 }

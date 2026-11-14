@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PRÉSTAMOS MIRIAM</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E💜%3C/text%3E%3C/svg%3E">
+<style>
+:root{--bg:#e9def8;--card:#fffdff;--tx:#241a38;--mut:#54476e;--bd:#c9b6ea;--ac:#a98be0;--acx:#1f1433;--ok:#1f6f45;--bad:#a3243f;--warn:#7a5800;--gbg:#c4ecd5;--gfg:#17613b;--ybg:#fcec9f;--yfg:#6e5000;--rbg:#f9c4d0;--rfg:#9a1f3d;--bbg:#c9e4fb;--bfg:#1c4f80;--lbg:#ddd0f6;--lfg:#4a2d8a;--obg:#fdd9bd;--ofg:#8a4a14;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:820px;margin:0 auto;padding:18px 14px 40px}
+h1{font-size:22px;margin:4px 0 10px;color:var(--lfg)}
+h2{font-size:16px;margin:0 0 10px;color:var(--lfg)}
+.st{display:inline-block;font-size:13px;font-weight:600;padding:6px 10px;border-radius:10px;margin:0 0 12px}
+.st.on{background:var(--gbg);color:var(--gfg)}.st.off{background:var(--ybg);color:var(--yfg)}.st.wait{background:var(--bbg);color:var(--bfg)}
+.grid{display:grid;gap:10px}
+.sum{grid-template-columns:repeat(2,1fr)}
+@media(min-width:640px){.sum{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;margin-top:14px}
+.sum .card{margin-top:0;border-color:rgba(60,40,100,.2)}
+.sum .card .k{color:inherit;font-weight:600}
+.sum .card .v{color:inherit}
+.sum .card:nth-child(1){background:var(--lbg);color:var(--lfg)}
+.sum .card:nth-child(2){background:var(--bbg);color:var(--bfg)}
+.sum .card:nth-child(3){background:var(--gbg);color:var(--gfg)}
+.sum .card:nth-child(4){background:var(--rbg);color:var(--rfg)}
+.sum .card:nth-child(5){background:var(--obg);color:var(--ofg)}
+.sum .card:nth-child(6){background:var(--ybg);color:var(--yfg)}
+.k{color:var(--mut);font-size:12px}
+.v{font-size:19px;font-weight:700;margin-top:2px}
+#fcard{background:var(--lbg);border-color:var(--ac)}
+#fcard label{color:var(--lfg);font-weight:600}
+form{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+form .full{grid-column:1/-1}
+label{display:block;font-size:12px;color:var(--mut);margin-bottom:3px}
+input,select,textarea{width:100%;padding:9px 10px;border:1.5px solid var(--ac);border-radius:8px;background:#fff;color:var(--tx);font:inherit}
+button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--lfg);background:var(--lbg);color:var(--lfg);padding:8px 12px;font-weight:600}
+button.p{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.prev{font-size:13px;color:var(--lfg);background:#fff;font-weight:600;padding:8px 10px;border:1px dashed var(--ac);border-radius:8px}
+#q{margin-top:18px;background:#fff}
+.tabs{display:flex;gap:6px;margin:10px 0}
+.tabs button{background:#fff}
+.tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.loan{box-shadow:0 2px 0 rgba(60,40,100,.1)}
+.top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.acts{display:flex;gap:6px;flex-shrink:0}
+.name{font-weight:700;font-size:16px}
+.meta{color:var(--mut);font-size:13px}
+.gan{font-weight:700;color:var(--ok);font-size:14px;margin-top:2px}
+.bar{height:6px;background:var(--bd);border-radius:6px;margin:10px 0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+.cu{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;margin-top:6px;border:1px solid rgba(60,40,100,.18);font-size:14px}
+.cu.s-g{background:var(--gbg);color:var(--gfg)}
+.cu.s-y{background:var(--ybg);color:var(--yfg)}
+.cu.s-r{background:var(--rbg);color:var(--rfg)}
+.cu.s-d{opacity:.55;background:#f3eefa}
+.cu .meta{color:inherit;font-weight:600}
+.loan.s-g{border-left:6px solid var(--gfg)}.loan.s-y{border-left:6px solid var(--yfg)}.loan.s-r{border-left:6px solid var(--rfg)}
+.sm{padding:4px 10px;font-size:13px}
+.del{color:var(--rfg);background:var(--rbg);border-color:var(--rfg)}
+.pr{display:flex;justify-content:space-between;gap:10px;width:100%;text-align:left;margin-top:6px;background:#fff;color:var(--tx);border:1px solid var(--bd);font-weight:400}
+.pr b{color:var(--lfg)}
+.empty{text-align:center;color:var(--mut);padding:22px}
+details{margin-top:18px}summary{cursor:pointer;color:var(--mut)}
+textarea{height:90px;font:12px monospace;margin:8px 0}
+.mo{position:fixed;inset:0;background:rgba(36,26,56,.5);display:none;align-items:center;justify-content:center;padding:20px;z-index:50}
+.mb{background:var(--card);border:2px solid var(--ac);border-radius:14px;padding:18px;max-width:360px;width:100%}
+.mtx{font-size:16px;font-weight:600;margin-bottom:14px}
+.mbtn{display:flex;gap:8px;justify-content:flex-end}
+.mb button.p.dg{background:var(--bad);color:#fff;border-color:var(--bad)}
+.tz{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(20px + env(safe-area-inset-bottom,0px));background:var(--lfg);color:#fff;padding:10px 14px;border-radius:10px;z-index:60;display:none;max-width:90%;font-size:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>💜 PRÉSTAMOS MIRIAM</h1>
+<div id="st" class="st wait">⏳ Conectando con tu cuenta…</div>
+
+<div class="grid sum">
+  <div class="card"><div class="k">Total prestado</div><div class="v" id="sPre">S/ 0.00</div></div>
+  <div class="card"><div class="k">Por cobrar</div><div class="v" id="sPor">S/ 0.00</div></div>
+  <div class="card"><div class="k">Cobrado</div><div class="v" id="sCob">S/ 0.00</div></div>
+  <div class="card"><div class="k">Vencido</div><div class="v" id="sVen">S/ 0.00</div></div>
+  <div class="card"><div class="k">Ganancia total</div><div class="v" id="sGan">S/ 0.00</div></div>
+  <div class="card"><div class="k">Ganancia ya cobrada</div><div class="v" id="sGanC">S/ 0.00</div></div>
+</div>
+
+<div class="card" id="wk">
+  <h2>📅 Cobros de esta semana</h2>
+  <div class="meta" id="wkS"></div>
+  <div id="wkL"></div>
+</div>
+
+<div class="card" id="fcard">
+  <h2 id="fh">Nuevo préstamo</h2>
+  <form id="f">
+    <div class="full"><label for="persona">Persona</label><input id="persona" required placeholder="Nombre de quien recibe"></div>
+    <div><label for="monto">Monto (S/)</label><input id="monto" type="number" min="1" step="0.01" required inputmode="decimal"></div>
+    <div><label for="pct">Interés</label>
+      <select id="pct"><option value="10">10%</option><option value="15">15%</option><option value="20">20%</option><option value="25">25%</option></select></div>
+    <div><label for="fp">Fecha del préstamo</label><input id="fp" type="date" required></div>
+    <div><label for="modo">Forma de pago</label>
+      <select id="modo"><option value="unico">Pago único</option><option value="cuotas">En cuotas</option></select></div>
+    <div><label for="fpago" id="lblPago">Fecha de pago</label><input id="fpago" type="date" required></div>
+    <div id="cuBox" style="display:none"><label for="n">N.º de cuotas</label><input id="n" type="number" min="2" max="60" value="4"></div>
+    <div id="frBox" style="display:none"><label for="freq">Frecuencia</label>
+      <select id="freq"><option value="semanal">Semanal</option><option value="quincenal">Quincenal</option><option value="mensual" selected>Mensual</option></select></div>
+    <div class="full prev" id="prev">Ingresa un monto para ver el total a cobrar.</div>
+    <div class="full" style="display:flex;gap:8px"><button class="p" type="submit" id="fs" style="flex:1">Guardar préstamo</button><button type="button" id="fcx" style="display:none">Cancelar</button></div>
+  </form>
+</div>
+
+<div class="card" id="pp" style="display:none">
+  <h2>👥 Totales por persona</h2>
+  <div class="meta">Toca un nombre para ver solo sus préstamos.</div>
+  <div id="ppL"></div>
+</div>
+
+<input id="q" type="search" placeholder="🔎 Buscar por nombre…" autocomplete="off">
+<div class="tabs" id="tabs">
+  <button data-t="todos" class="on">Todos</button><button data-t="pend">Pendientes</button><button data-t="pag">Pagados</button>
+</div>
+<div id="list"></div>
+
+<details>
+  <summary>Respaldo de datos</summary>
+  <p class="meta">Tus préstamos se guardan en Firebase y se comparten con quien tenga el código de acceso. El enlace de acceso incluye el código: pásalo solo a la otra persona. Para traer datos de otra versión, pega aquí su respaldo y toca Restaurar.</p>
+  <textarea id="bk" placeholder="Respaldo (JSON)"></textarea>
+  <button id="bkGet">Generar respaldo</button> <button id="bkSet">Restaurar</button> <button id="lkBtn">Copiar enlace de acceso</button>
+</details>
+</main>
+
+<div id="mo" class="mo" role="dialog" aria-modal="true"><div class="mb"><div id="mt" class="mtx"></div><div class="mbtn"><button id="mc" type="button">Cancelar</button><button id="my" type="button" class="p">Sí, confirmar</button></div></div></div>
+<div id="gate" class="mo" role="dialog" aria-modal="true"><div class="mb"><div class="mtx">🔑 Código de acceso</div>
+<p class="meta" style="margin:0 0 8px">Escribe el código de tu espacio de préstamos. Si es la primera vez, toca Generar código y luego pásalo solo a la otra persona.</p>
+<input id="gc" placeholder="Código de acceso" autocomplete="off" autocapitalize="off" spellcheck="false">
+<div class="meta" id="gMsg" style="margin:8px 0"></div>
+<div class="mbtn"><button id="gGen" type="button">Generar código</button><button id="gOk" type="button" class="p">Entrar</button></div></div></div>
+<div id="tz" class="tz"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script>
+/* ⚙️ PEGA AQUÍ tu configuración de Firebase (Configuración del proyecto → Tus apps → Web → firebaseConfig) */
+const FIREBASE_CONFIG={apiKey:"AIzaSyCwFbrPs7u7sf6m46J_dAzjwppCQ_huvHo",authDomain:"prestamos-miriam.firebaseapp.com",projectId:"prestamos-miriam",storageBucket:"prestamos-miriam.firebasestorage.app",messagingSenderId:"175703767286",appId:"1:175703767286:web:fb93a294f6ae1c01bd54d7"};
+const KEY='prestamos_v1',MIG='prestamos_migrado_v1';
+let loans=[],tab='todos',q='',editId=null,col=null,online=false,ready=false,migTried=false,onYes=null,tzT=null,errState=false;
+const $=id=>document.getElementById(id);
+const r2=n=>Math.round(n*100)/100;
+const fmt=n=>'S/ '+n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
+const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const show=s=>pd(s).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'});
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const today=ds(new Date());
+const dd=f=>Math.round((pd(f)-pd(today))/864e5);
+const lvl=f=>{const d=dd(f);return d<=2?'r':d<=7?'y':'g'};
+const dtxt=f=>{const d=dd(f);return d<0?'Vencida hace '+(-d)+(d===-1?' día':' días'):d===0?'Vence hoy':d===1?'Vence mañana':'Vence en '+d+' días'};
+const done=l=>l.cuotas.every(c=>c.pagado);
+
+/* ---------- Estado y guardado (Firebase) ---------- */
+const CODE_KEY='prestamos_codigo_v1',CODE_RE=/^[A-Za-z0-9_-]{12,60}$/;
+function setSt(k){
+  const m={wait:['wait','⏳ Conectando…'],on:['on','☁️ Guardado en línea y compartido con quien tenga el código de acceso'],slow:['off','⚠️ Todavía no hay conexión con Firebase; esperando…'],err:['off','⚠️ Sin conexión con Firebase. Recarga la página.']};
+  const s=$('st');s.className='st '+m[k][0];s.textContent=m[k][1];
+}
+function toast(t){const e=$('tz');e.textContent=t;e.style.display='block';clearTimeout(tzT);tzT=setTimeout(()=>{e.style.display='none'},4500);}
+function loadLocal(){let a=[];try{a=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}loans=Array.isArray(a)?a.filter(x=>x&&Array.isArray(x.cuotas)):[];}
+function saveLocal(){try{localStorage.setItem(KEY,JSON.stringify(loans))}catch(e){}}
+function fail(){toast('No se pudo guardar en línea. Revisa tu conexión e inténtalo de nuevo.');}
+async function put(l){if(online){try{await col.doc(String(l.id)).set(l)}catch(e){fail()}}else fail();}
+async function removeLoan(id){if(online){try{await col.doc(String(id)).delete()}catch(e){fail()}}else fail();}
+async function replaceAll(arr){
+  if(online){
+    try{
+      const keep=new Set(arr.map(x=>String(x.id)));
+      for(const x of loans){if(!keep.has(String(x.id)))await col.doc(String(x.id)).delete();}
+      for(const x of arr)await col.doc(String(x.id)).set(x);
+    }catch(e){fail();return;}
+  }
+  if(!online)return;loans=arr;render();
+}
+function migrate(snap){
+  if(migTried||snap.metadata.fromCache)return;migTried=true;
+  let loc=[];try{loc=JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){}
+  if(!Array.isArray(loc)||!loc.length||localStorage.getItem(MIG)==='1')return;
+  const have=new Set(snap.docs.map(d=>d.id));
+  const add=loc.filter(x=>x&&Array.isArray(x.cuotas)&&x.id!=null&&!have.has(String(x.id)));
+  Promise.all(add.map(x=>col.doc(String(x.id)).set(x))).then(()=>{
+    try{localStorage.setItem(MIG,'1')}catch(e){}
+    if(add.length)toast('Se subieron '+add.length+' préstamo(s) de este dispositivo a la nube.');
+  }).catch(fail);
+}
+
+/* ---------- Código de acceso ---------- */
+function getCode(){let c='';try{c=localStorage.getItem(CODE_KEY)||''}catch(e){}return CODE_RE.test(c)?c:'';}
+function setCode(c){try{localStorage.setItem(CODE_KEY,c)}catch(e){}}
+function newCode(){
+  const a=new Uint8Array(20);crypto.getRandomValues(a);
+  const s='abcdefghjkmnpqrstuvwxyz23456789';
+  return Array.from(a,x=>s[x%s.length]).join('');
+}
+function openGate(){$('gate').style.display='flex';$('gc').focus();}
+$('gGen').onclick=()=>{$('gc').value=newCode();$('gMsg').textContent='Guarda este código y pásalo solo a la otra persona (mejor con el enlace de acceso, que aparece en Respaldo de datos).';};
+$('gOk').onclick=()=>{
+  const c=$('gc').value.trim();
+  if(!CODE_RE.test(c)){$('gMsg').textContent='El código debe tener entre 12 y 60 caracteres: letras, números, guion o guion bajo.';return;}
+  setCode(c);$('gate').style.display='none';startDb(c);
+};
+$('lkBtn').onclick=()=>{
+  const c=getCode();if(!c){toast('Todavía no hay un código de acceso en este dispositivo.');return;}
+  $('bk').value=location.origin+location.pathname+'#'+c;$('bk').select();
+  try{navigator.clipboard.writeText($('bk').value)}catch(e){}
+  toast('Enlace de acceso listo: pásalo solo a la otra persona.');
+};
+
+/* ---------- Conexión ---------- */
+function toLocal(msg){online=false;col=null;loans=[];ready=false;errState=true;setSt('err');render();if(msg)toast(msg);}
+function startDb(code){
+  try{
+    if(!firebase.apps.length)firebase.initializeApp(FIREBASE_CONFIG);
+    col=firebase.firestore().collection('espacios').doc(code).collection('prestamos');
+    online=true;ready=false;setSt('wait');render();
+    const t=setTimeout(()=>setSt('slow'),10000);
+    col.onSnapshot(snap=>{
+      clearTimeout(t);
+      loans=snap.docs.map(d=>d.data()).filter(x=>x&&Array.isArray(x.cuotas));
+      ready=true;setSt(snap.metadata.fromCache?'wait':'on');render();migrate(snap);
+    },err=>{clearTimeout(t);toLocal('No se pudo conectar con Firebase. Revisa que las reglas de Firestore estén publicadas.');});
+  }catch(e){toLocal('No se pudo iniciar Firebase. Revisa la configuración.');}
+}
+function init(){
+  if(!FIREBASE_CONFIG.projectId){toLocal('Falta la configuración de Firebase.');return;}
+  if(typeof firebase==='undefined'){toLocal('No se pudo cargar Firebase. Revisa tu conexión.');return;}
+  const hs=location.hash.slice(1);
+  if(CODE_RE.test(hs)){setCode(hs);try{history.replaceState(null,'',location.pathname+location.search)}catch(e){}}
+  const code=getCode();
+  if(!code){openGate();return;}
+  startDb(code);
+}
+
+/* ---------- Formulario ---------- */
+function step(s,freq,i){
+  const d=pd(s);
+  if(freq==='semanal')d.setDate(d.getDate()+7*i);
+  else if(freq==='quincenal')d.setDate(d.getDate()+15*i);
+  else{const day=d.getDate();d.setDate(1);d.setMonth(d.getMonth()+i);
+    const last=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();d.setDate(Math.min(day,last));}
+  return ds(d);
+}
+function plan(){
+  const monto=parseFloat($('monto').value)||0,pct=+$('pct').value;
+  const total=r2(monto*(1+pct/100));
+  const cuotas=$('modo').value==='cuotas'?Math.max(2,parseInt($('n').value)||2):1;
+  return{monto,pct,total,cuotas,interes:r2(total-monto)};
+}
+function updForm(){
+  const c=$('modo').value==='cuotas';
+  $('cuBox').style.display=c?'':'none';
+  $('frBox').style.display=c?'':'none';
+  $('lblPago').textContent=c?'Fecha de la 1.ª cuota':'Fecha de pago';
+  const p=plan();
+  $('prev').textContent=p.monto?
+    'Interés: '+fmt(p.interes)+' · Total a cobrar: '+fmt(p.total)+(p.cuotas>1?' · '+p.cuotas+' cuotas de ≈ '+fmt(p.total/p.cuotas):''):
+    'Ingresa un monto para ver el total a cobrar.';
+}
+function resetForm(){
+  editId=null;$('f').reset();
+  $('fp').value=today;$('fpago').value=today;$('fpago').min=today;
+  $('fh').textContent='Nuevo préstamo';$('fs').textContent='Guardar préstamo';$('fcx').style.display='none';
+  updForm();
+}
+function inferFreq(cu){
+  if(cu.length<2)return'mensual';
+  const d=Math.round((pd(cu[1].fecha)-pd(cu[0].fecha))/864e5);
+  return d<=8?'semanal':d<=16?'quincenal':'mensual';
+}
+function startEdit(l){
+  editId=l.id;
+  $('persona').value=l.persona;$('monto').value=l.monto;$('pct').value=String(l.pct);
+  $('fp').value=l.fprestamo;$('fpago').min=l.fprestamo;$('fpago').value=l.cuotas[0].fecha;
+  $('modo').value=l.cuotas.length>1?'cuotas':'unico';
+  if(l.cuotas.length>1){$('n').value=l.cuotas.length;$('freq').value=inferFreq(l.cuotas);}
+  $('fh').textContent='Editar préstamo';$('fs').textContent='Guardar cambios';$('fcx').style.display='';
+  updForm();$('fcard').scrollIntoView({behavior:'smooth',block:'start'});
+}
+['monto','pct','modo','n'].forEach(i=>$(i).addEventListener('input',updForm));
+$('fp').addEventListener('change',()=>{$('fpago').min=$('fp').value;if($('fpago').value<$('fp').value)$('fpago').value=$('fp').value;});
+$('fcx').onclick=resetForm;
+$('f').addEventListener('submit',e=>{
+  e.preventDefault();
+  const p=plan();if(!p.monto)return;
+  const freq=$('freq').value,first=$('fpago').value,base=r2(p.total/p.cuotas),cuotas=[];
+  for(let i=0;i<p.cuotas;i++){
+    const m=i===p.cuotas-1?r2(p.total-base*(p.cuotas-1)):base;
+    cuotas.push({fecha:p.cuotas===1?first:step(first,freq,i),monto:m,pagado:false});
+  }
+  const data={persona:$('persona').value.trim(),monto:p.monto,pct:p.pct,total:p.total,fprestamo:$('fp').value,cuotas};
+  if(editId){
+    const l=loans.find(x=>x.id===editId);
+    if(!l){resetForm();return;}
+    const same=l.cuotas.length===cuotas.length,anyPaid=l.cuotas.some(c=>c.pagado);
+    const apply=()=>{
+      if(same)cuotas.forEach((c,i)=>{c.pagado=l.cuotas[i].pagado;});
+      Object.assign(l,data);put(l);resetForm();render();toast('Cambios guardados.');
+    };
+    if(!same&&anyPaid)ask('Cambiaste el número de cuotas: los pagos ya marcados se reiniciarán. ¿Continuar?',apply,true);
+    else apply();
+    return;
+  }
+  const l=Object.assign({id:Date.now()},data);
+  loans.unshift(l);put(l);resetForm();render();
+});
+resetForm();
+
+/* ---------- Confirmación ---------- */
+function ask(msg,yes,danger){$('mt').textContent=msg;$('my').className='p'+(danger?' dg':'');onYes=yes;$('mo').style.display='flex';}
+function closeM(){$('mo').style.display='none';onYes=null;}
+$('mc').onclick=closeM;
+$('my').onclick=()=>{const f=onYes;closeM();if(f)f();};
+$('mo').addEventListener('click',e=>{if(e.target.id==='mo')closeM();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeM();});
+
+/* ---------- Acciones ---------- */
+function onAct(e){
+  const b=e.target.closest('button');if(!b||!b.dataset.a)return;
+  const l=loans.find(x=>x.id===+b.dataset.id);if(!l)return;
+  const a=b.dataset.a;
+  if(a==='pay'){
+    const c=l.cuotas[+b.dataset.i];if(!c)return;
+    if(c.pagado)ask('¿Seguro que quieres desmarcar este pago de '+l.persona+' ('+fmt(c.monto)+')? Volverá a figurar como pendiente.',()=>{c.pagado=false;put(l);render();},true);
+    else{c.pagado=true;put(l);render();}
+  }
+  if(a==='edit')startEdit(l);
+  if(a==='del')ask('¿Eliminar el préstamo de '+l.persona+' por '+fmt(l.monto)+'? Esta acción no se puede deshacer.',()=>{loans=loans.filter(x=>x.id!==l.id);if(editId===l.id)resetForm();removeLoan(l.id);render();},true);
+}
+$('list').addEventListener('click',onAct);
+$('wkL').addEventListener('click',onAct);
+$('tabs').addEventListener('click',e=>{
+  const t=e.target.dataset.t;if(!t)return;
+  tab=t;[...$('tabs').children].forEach(b=>b.classList.toggle('on',b.dataset.t===t));render();
+});
+$('q').addEventListener('input',()=>{q=$('q').value.trim().toLowerCase();render();});
+$('ppL').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-p]');if(!b)return;
+  $('q').value=b.dataset.p;q=b.dataset.p.toLowerCase();render();$('q').scrollIntoView({behavior:'smooth',block:'center'});
+});
+$('bkGet').onclick=()=>{$('bk').value=JSON.stringify(loans);$('bk').select();};
+$('bkSet').onclick=()=>{
+  try{
+    const d=JSON.parse($('bk').value);
+    if(!Array.isArray(d)||!d.every(x=>x&&x.id!=null&&Array.isArray(x.cuotas)&&typeof x.total==='number'&&typeof x.monto==='number'))throw 0;
+    ask('¿Restaurar este respaldo? Reemplazará todos los préstamos actuales.',()=>{replaceAll(d);$('bk').value='';},true);
+  }catch(e){$('bk').value='';$('bk').placeholder='Respaldo no válido';}
+};
+
+/* ---------- Dibujo ---------- */
+function weekly(){
+  const items=[];
+  loans.forEach(l=>l.cuotas.forEach((c,i)=>{if(!c.pagado&&dd(c.fecha)<=7)items.push({l,c,i});}));
+  items.sort((a,b)=>a.c.fecha.localeCompare(b.c.fecha));
+  const tot=items.reduce((s,x)=>s+x.c.monto,0);
+  $('wkS').textContent=items.length?items.length+' cobro(s) · total '+fmt(tot)+' (incluye vencidos)':'';
+  $('wkL').innerHTML=items.length?items.map(x=>
+    '<div class="cu s-'+lvl(x.c.fecha)+'"><div><b>'+esc(x.l.persona)+'</b> · '+show(x.c.fecha)+' · <b>'+fmt(x.c.monto)+'</b><br><span class="meta">'+dtxt(x.c.fecha)+'</span></div>'+
+    '<button class="sm" data-a="pay" data-id="'+x.l.id+'" data-i="'+x.i+'">Cobrada</button></div>').join('')
+    :'<div class="empty">No tienes cobros pendientes en los próximos 7 días. 🎉</div>';
+}
+function people(){
+  const m={};
+  loans.forEach(l=>{
+    const k=l.persona.trim().toLowerCase();
+    const o=m[k]||(m[k]={n:l.persona.trim(),c:0,pre:0,por:0,gan:0});
+    o.c++;o.pre+=l.monto;o.gan+=l.total-l.monto;
+    l.cuotas.forEach(c=>{if(!c.pagado)o.por+=c.monto;});
+  });
+  const arr=Object.values(m).sort((a,b)=>b.por-a.por);
+  $('pp').style.display=arr.length?'':'none';
+  $('ppL').innerHTML=arr.map(o=>
+    '<button class="pr" data-p="'+esc(o.n)+'"><span><b>'+esc(o.n)+'</b><br><span class="meta">'+o.c+(o.c===1?' préstamo':' préstamos')+' · prestado '+fmt(o.pre)+'</span></span>'+
+    '<span style="text-align:right"><b>Te debe '+fmt(o.por)+'</b><br><span class="meta">Ganancia '+fmt(o.gan)+'</span></span></button>').join('');
+}
+function render(){
+  let pre=0,por=0,cob=0,ven=0,gan=0,ganC=0;
+  loans.forEach(l=>{
+    const g=l.total-l.monto;pre+=l.monto;gan+=g;
+    l.cuotas.forEach(c=>{if(c.pagado){cob+=c.monto;ganC+=c.monto*g/l.total;}else{por+=c.monto;if(c.fecha<today)ven+=c.monto;}});
+  });
+  $('sPre').textContent=fmt(pre);$('sPor').textContent=fmt(por);$('sCob').textContent=fmt(cob);$('sVen').textContent=fmt(ven);
+  $('sGan').textContent=fmt(gan);$('sGanC').textContent=fmt(ganC);
+  if(!ready){const m=errState?'Sin conexión con Firebase. Recarga la página.':'Cargando…';$('wkL').innerHTML='<div class="empty">'+m+'</div>';$('list').innerHTML='<div class="card empty">'+m+'</div>';return;}
+  weekly();people();
+
+  let list=loans.filter(l=>(tab==='todos'||(tab==='pag'?done(l):!done(l)))&&(!q||l.persona.toLowerCase().includes(q)));
+  const nextDue=l=>(l.cuotas.find(c=>!c.pagado)||{fecha:'9999'}).fecha;
+  list=list.slice().sort((a,b)=>nextDue(a).localeCompare(nextDue(b)));
+  if(!list.length){$('list').innerHTML='<div class="card empty">'+(q?'No hay préstamos que coincidan con la búsqueda.':'No hay préstamos en esta vista.')+'</div>';return;}
+
+  $('list').innerHTML=list.map(l=>{
+    const pagado=l.cuotas.filter(c=>c.pagado).reduce((s,c)=>s+c.monto,0);
+    const pctPag=Math.round(pagado/l.total*100);
+    const gc=pagado*(l.total-l.monto)/l.total;
+    const un=l.cuotas.filter(c=>!c.pagado);const ll=un.length?lvl(un[0].fecha):'d';
+    const rows=l.cuotas.map((c,i)=>{
+      const lv=c.pagado?'d':lvl(c.fecha),st=c.pagado?'Cobrada':dtxt(c.fecha);
+      const lbl=l.cuotas.length>1?'Cuota '+(i+1)+' · ':'Pago · ';
+      return '<div class="cu s-'+lv+'"><div>'+lbl+show(c.fecha)+' · <b>'+fmt(c.monto)+'</b><br><span class="meta">'+st+'</span></div>'+
+        '<button class="sm" data-a="pay" data-id="'+l.id+'" data-i="'+i+'">'+(c.pagado?'Deshacer':'Marcar cobrada')+'</button></div>';
+    }).join('');
+    return '<div class="card loan s-'+ll+'"><div class="top"><div><div class="name">'+esc(l.persona)+(done(l)?' ✅':'')+'</div>'+
+      '<div class="meta">Prestado '+fmt(l.monto)+' el '+show(l.fprestamo)+' · '+l.pct+'% → total '+fmt(l.total)+'</div>'+
+      '<div class="gan">Ganas '+fmt(l.total-l.monto)+' · ya cobrado '+fmt(gc)+'</div></div>'+
+      '<div class="acts"><button class="sm" data-a="edit" data-id="'+l.id+'">Editar</button><button class="sm del" data-a="del" data-id="'+l.id+'">Eliminar</button></div></div>'+
+      '<div class="bar"><i style="width:'+pctPag+'%"></i></div>'+
+      '<div class="meta" style="margin-bottom:4px">Cobrado '+fmt(pagado)+' de '+fmt(l.total)+' ('+pctPag+'%)</div>'+rows+'</div>';
+  }).join('');
+}
+render();
+init();
+</script>
+</body>
+</html>

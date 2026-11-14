@@ -44,6 +44,15 @@ button.p{background:var(--ac);color:var(--acx);border-color:var(--ac)}
 .tabs button{background:#fff}
 .tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
 .nw{white-space:nowrap}
+.cd{margin-top:8px}
+.cd summary{cursor:pointer;list-style:none;font-weight:700;padding:9px 12px;border-radius:10px;background:var(--lbg);color:var(--lfg);border:1px solid var(--bd)}
+.cd summary::-webkit-details-marker{display:none}
+.cd summary::before{content:'▸ '}
+.cd[open] summary::before{content:'▾ '}
+.cd.s-g summary{background:var(--gbg);color:var(--gfg)}
+.cd.s-y summary{background:var(--ybg);color:var(--yfg)}
+.cd.s-r summary{background:var(--rbg);color:var(--rfg)}
+.cd .nx{font-weight:600}
 .loan{box-shadow:0 2px 0 rgba(60,40,100,.1)}
 .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .acts{display:flex;gap:6px;flex-shrink:0}
@@ -148,7 +157,7 @@ textarea{height:90px;font:12px monospace;margin:8px 0}
 const FIREBASE_CONFIG={apiKey:"AIzaSyCwFbrPs7u7sf6m46J_dAzjwppCQ_huvHo",authDomain:"prestamos-miriam.firebaseapp.com",projectId:"prestamos-miriam",storageBucket:"prestamos-miriam.firebasestorage.app",messagingSenderId:"175703767286",appId:"1:175703767286:web:fb93a294f6ae1c01bd54d7"};
 const ACCESS_CODE='sta956evct4k7ydmq2ce4uys';
 const KEY='prestamos_v1',MIG='prestamos_migrado_v1';
-let loans=[],tab='todos',q='',editId=null,col=null,online=false,ready=false,migTried=false,onYes=null,tzT=null,errState=false;
+let loans=[],tab='todos',q='',editId=null,col=null,online=false,ready=false,migTried=false,onYes=null,tzT=null,errState=false,openIds=new Set();
 const $=id=>document.getElementById(id);
 const r2=n=>Math.round(n*100)/100;
 const fmt=n=>'S/\u00a0'+n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
@@ -329,6 +338,7 @@ function onAct(e){
   if(a==='del')ask('¿Eliminar el préstamo de '+l.persona+' por '+fmt(l.monto)+'? Esta acción no se puede deshacer.',()=>{loans=loans.filter(x=>x.id!==l.id);if(editId===l.id)resetForm();removeLoan(l.id);render();},true);
 }
 $('list').addEventListener('click',onAct);
+$('list').addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.id){if(d.open)openIds.add(d.dataset.id);else openIds.delete(d.dataset.id);}},true);
 $('wkL').addEventListener('click',onAct);
 $('tabs').addEventListener('click',e=>{
   const t=e.target.dataset.t;if(!t)return;
@@ -394,6 +404,7 @@ function render(){
     const pagado=l.cuotas.filter(c=>c.pagado).reduce((s,c)=>s+c.monto,0);
     const pctPag=Math.round(pagado/l.total*100);
     const gc=pagado*(l.total-l.monto)/l.total;
+    const nPag=l.cuotas.filter(c=>c.pagado).length;
     const un=l.cuotas.filter(c=>!c.pagado);const ll=un.length?lvl(un[0].fecha):'d';
     const rows=l.cuotas.map((c,i)=>{
       const lv=c.pagado?'d':lvl(c.fecha),st=c.pagado?'Cobrada':dtxt(c.fecha);
@@ -405,8 +416,8 @@ function render(){
       '<div class="meta"><span class="nw">Prestado '+fmt(l.monto)+'</span> <span class="nw">el '+show(l.fprestamo)+'</span> · <span class="nw">'+l.pct+'% → total '+fmt(l.total)+'</span></div>'+
       '<div class="gan"><span class="nw">Ganas '+fmt(l.total-l.monto)+'</span>'+(l.cuotas.length>1?' · <span class="nw">ya cobrado '+fmt(gc)+'</span>':'')+'</div></div>'+
       '<div class="acts"><button class="sm" data-a="edit" data-id="'+l.id+'">Editar</button><button class="sm del" data-a="del" data-id="'+l.id+'">Eliminar</button></div></div>'+
-      '<div class="bar"><i style="width:'+pctPag+'%"></i></div>'+
-      '<div class="meta" style="margin-bottom:4px"><span class="nw">Cobrado '+fmt(pagado)+'</span> <span class="nw">de '+fmt(l.total)+' ('+pctPag+'%)</span></div>'+rows+'</div>';
+      
+      (l.cuotas.length>1?'<details class="cd s-'+ll+'" data-id="'+l.id+'"'+(openIds.has(String(l.id))?' open':'')+'><summary>Pago en cuotas '+nPag+'/'+l.cuotas.length+(un.length?' <span class="nx">· '+dtxt(un[0].fecha)+'</span>':'')+'</summary><div class="bar"><i style="width:'+pctPag+'%"></i></div><div class="meta" style="margin-bottom:4px"><span class="nw">Cobrado '+fmt(pagado)+'</span> <span class="nw">de '+fmt(l.total)+' ('+pctPag+'%)</span></div>'+rows+'</details>':rows)+'</div>';
   }).join('');
 }
 render();

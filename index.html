@@ -43,6 +43,7 @@ button.p{background:var(--ac);color:var(--acx);border-color:var(--ac)}
 .tabs{display:flex;gap:6px;margin:10px 0}
 .tabs button{background:#fff}
 .tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
+.nw{white-space:nowrap}
 .loan{box-shadow:0 2px 0 rgba(60,40,100,.1)}
 .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
 .acts{display:flex;gap:6px;flex-shrink:0}
@@ -150,10 +151,10 @@ const KEY='prestamos_v1',MIG='prestamos_migrado_v1';
 let loans=[],tab='todos',q='',editId=null,col=null,online=false,ready=false,migTried=false,onYes=null,tzT=null,errState=false;
 const $=id=>document.getElementById(id);
 const r2=n=>Math.round(n*100)/100;
-const fmt=n=>'S/ '+n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fmt=n=>'S/\u00a0'+n.toLocaleString('es-PE',{minimumFractionDigits:2,maximumFractionDigits:2});
 const pd=s=>{const[a,b,c]=s.split('-').map(Number);return new Date(a,b-1,c)};
 const ds=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
-const show=s=>pd(s).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'});
+const show=s=>pd(s).toLocaleDateString('es-PE',{day:'2-digit',month:'short',year:'numeric'}).replace(/ /g,'\u00a0');
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const today=ds(new Date());
 const dd=f=>Math.round((pd(f)-pd(today))/864e5);
@@ -355,7 +356,7 @@ function weekly(){
   const tot=items.reduce((s,x)=>s+x.c.monto,0);
   $('wkS').textContent=items.length?items.length+' cobro(s) · total '+fmt(tot)+' (incluye vencidos)':'';
   $('wkL').innerHTML=items.length?items.map(x=>
-    '<div class="cu s-'+lvl(x.c.fecha)+'"><div><b>'+esc(x.l.persona)+'</b> · '+show(x.c.fecha)+' · <b>'+fmt(x.c.monto)+'</b><br><span class="meta">'+dtxt(x.c.fecha)+'</span></div>'+
+    '<div class="cu s-'+lvl(x.c.fecha)+'"><div><b>'+esc(x.l.persona)+'</b> · <span class="nw">'+show(x.c.fecha)+'</span> · <b class="nw">'+fmt(x.c.monto)+'</b><br><span class="meta">'+dtxt(x.c.fecha)+'</span></div>'+
     '<button class="sm" data-a="pay" data-id="'+x.l.id+'" data-i="'+x.i+'">Cobrada</button></div>').join('')
     :'<div class="empty">No tienes cobros pendientes en los próximos 7 días. 🎉</div>';
 }
@@ -370,8 +371,8 @@ function people(){
   const arr=Object.values(m).sort((a,b)=>b.por-a.por);
   $('pp').style.display=arr.length?'':'none';
   $('ppL').innerHTML=arr.map(o=>
-    '<button class="pr" data-p="'+esc(o.n)+'"><span><b>'+esc(o.n)+'</b><br><span class="meta">'+o.c+(o.c===1?' préstamo':' préstamos')+' · prestado '+fmt(o.pre)+'</span></span>'+
-    '<span style="text-align:right"><b>Te debe '+fmt(o.por)+'</b><br><span class="meta">Ganancia '+fmt(o.gan)+'</span></span></button>').join('');
+    '<button class="pr" data-p="'+esc(o.n)+'"><span><b>'+esc(o.n)+'</b><br><span class="meta"><span class="nw">'+o.c+(o.c===1?' préstamo':' préstamos')+'</span> · <span class="nw">prestado '+fmt(o.pre)+'</span></span></span>'+
+    '<span style="text-align:right"><b class="nw">Te debe '+fmt(o.por)+'</b><br><span class="meta nw">Ganancia '+fmt(o.gan)+'</span></span></button>').join('');
 }
 function render(){
   let pre=0,por=0,cob=0,ven=0,gan=0,ganC=0;
@@ -397,15 +398,15 @@ function render(){
     const rows=l.cuotas.map((c,i)=>{
       const lv=c.pagado?'d':lvl(c.fecha),st=c.pagado?'Cobrada':dtxt(c.fecha);
       const lbl=l.cuotas.length>1?'Cuota '+(i+1)+' · ':'Pago · ';
-      return '<div class="cu s-'+lv+'"><div>'+lbl+show(c.fecha)+' · <b>'+fmt(c.monto)+'</b><br><span class="meta">'+st+'</span></div>'+
+      return '<div class="cu s-'+lv+'"><div><span class="nw">'+lbl+show(c.fecha)+'</span> · <b class="nw">'+fmt(c.monto)+'</b><br><span class="meta">'+st+'</span></div>'+
         '<button class="sm" data-a="pay" data-id="'+l.id+'" data-i="'+i+'">'+(c.pagado?'Deshacer':'Marcar cobrada')+'</button></div>';
     }).join('');
     return '<div class="card loan s-'+ll+'"><div class="top"><div><div class="name">'+esc(l.persona)+(done(l)?' ✅':'')+'</div>'+
-      '<div class="meta">Prestado '+fmt(l.monto)+' el '+show(l.fprestamo)+' · '+l.pct+'% → total '+fmt(l.total)+'</div>'+
-      '<div class="gan">Ganas '+fmt(l.total-l.monto)+' · ya cobrado '+fmt(gc)+'</div></div>'+
+      '<div class="meta"><span class="nw">Prestado '+fmt(l.monto)+'</span> <span class="nw">el '+show(l.fprestamo)+'</span> · <span class="nw">'+l.pct+'% → total '+fmt(l.total)+'</span></div>'+
+      '<div class="gan"><span class="nw">Ganas '+fmt(l.total-l.monto)+'</span> · <span class="nw">ya cobrado '+fmt(gc)+'</span></div></div>'+
       '<div class="acts"><button class="sm" data-a="edit" data-id="'+l.id+'">Editar</button><button class="sm del" data-a="del" data-id="'+l.id+'">Eliminar</button></div></div>'+
       '<div class="bar"><i style="width:'+pctPag+'%"></i></div>'+
-      '<div class="meta" style="margin-bottom:4px">Cobrado '+fmt(pagado)+' de '+fmt(l.total)+' ('+pctPag+'%)</div>'+rows+'</div>';
+      '<div class="meta" style="margin-bottom:4px"><span class="nw">Cobrado '+fmt(pagado)+'</span> <span class="nw">de '+fmt(l.total)+' ('+pctPag+'%)</span></div>'+rows+'</div>';
   }).join('');
 }
 render();

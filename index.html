@@ -403,7 +403,7 @@ function render(){
     }).join('');
     return '<div class="card loan s-'+ll+'"><div class="top"><div><div class="name">'+esc(l.persona)+(done(l)?' ✅':'')+'</div>'+
       '<div class="meta"><span class="nw">Prestado '+fmt(l.monto)+'</span> <span class="nw">el '+show(l.fprestamo)+'</span> · <span class="nw">'+l.pct+'% → total '+fmt(l.total)+'</span></div>'+
-      '<div class="gan"><span class="nw">Ganas '+fmt(l.total-l.monto)+'</span> · <span class="nw">ya cobrado '+fmt(gc)+'</span></div></div>'+
+      '<div class="gan"><span class="nw">Ganas '+fmt(l.total-l.monto)+'</span>'+(l.cuotas.length>1?' · <span class="nw">ya cobrado '+fmt(gc)+'</span>':'')+'</div></div>'+
       '<div class="acts"><button class="sm" data-a="edit" data-id="'+l.id+'">Editar</button><button class="sm del" data-a="del" data-id="'+l.id+'">Eliminar</button></div></div>'+
       '<div class="bar"><i style="width:'+pctPag+'%"></i></div>'+
       '<div class="meta" style="margin-bottom:4px"><span class="nw">Cobrado '+fmt(pagado)+'</span> <span class="nw">de '+fmt(l.total)+' ('+pctPag+'%)</span></div>'+rows+'</div>';

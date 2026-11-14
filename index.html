@@ -44,6 +44,21 @@ button.p{background:var(--ac);color:var(--acx);border-color:var(--ac)}
 .tabs button{background:#fff}
 .tabs button.on{background:var(--ac);color:var(--acx);border-color:var(--ac)}
 .nw{white-space:nowrap}
+.rpn{display:flex;justify-content:space-between;align-items:center;margin:12px 0}
+.rpg{grid-template-columns:repeat(2,1fr);margin-bottom:14px}
+.rc{border-radius:12px;padding:10px 12px}
+.rc .k{color:inherit;font-weight:600;font-size:12px}
+.rc .v{font-size:18px;font-weight:800;margin-top:0}
+.rc .s{font-size:12px;font-weight:600}
+.rc.l{background:var(--lbg);color:var(--lfg)}.rc.g{background:var(--gbg);color:var(--gfg)}.rc.y{background:var(--ybg);color:var(--yfg)}.rc.b{background:var(--bbg);color:var(--bfg)}
+.chart{display:flex;justify-content:space-between;gap:6px;align-items:flex-end;margin-top:8px}
+.bg{flex:1;text-align:center}
+.bb{display:flex;gap:3px;justify-content:center;height:125px}
+.bx{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;width:42%}
+.bx i{display:block;width:100%;border-radius:4px 4px 0 0;min-height:2px}
+.bv{font-size:10px;color:var(--mut);font-weight:600;white-space:nowrap}
+.bl{font-size:12px;color:var(--mut);margin-top:4px;text-transform:capitalize}.bl.on{color:var(--lfg);font-weight:800}
+.lg{font-size:12px;color:var(--mut);margin-top:8px}.lg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin:0 4px 0 8px}.lg i:first-child{margin-left:0}
 .top2{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .mn{margin-top:6px;display:flex;align-items:center;flex-wrap:wrap;gap:6px 10px}
 .big{font-size:22px;font-weight:800}
@@ -119,6 +134,10 @@ textarea{height:90px;font:12px monospace;margin:8px 0}
   <div class="meta" id="wkS"></div>
   <div id="wkL"></div>
 </div>
+
+<details class="card" id="rp"><summary style="font-weight:700;color:var(--lfg);font-size:16px;cursor:pointer">📊 Reporte mensual</summary>
+  <div id="rpB"></div>
+</details>
 
 <div class="card" id="fcard">
   <h2 id="fh">Nuevo préstamo</h2>
@@ -316,7 +335,7 @@ $('f').addEventListener('submit',e=>{
     if(!l){resetForm();return;}
     const same=l.cuotas.length===cuotas.length,anyPaid=l.cuotas.some(c=>c.pagado);
     const apply=()=>{
-      if(same)cuotas.forEach((c,i)=>{c.pagado=l.cuotas[i].pagado;});
+      if(same)cuotas.forEach((c,i)=>{c.pagado=l.cuotas[i].pagado;if(l.cuotas[i].fpagado)c.fpagado=l.cuotas[i].fpagado;});
       Object.assign(l,data);put(l);resetForm();render();toast('Cambios guardados.');
     };
     if(!same&&anyPaid)ask('Cambiaste el número de cuotas: los pagos ya marcados se reiniciarán. ¿Continuar?',apply,true);
@@ -343,8 +362,8 @@ function onAct(e){
   const a=b.dataset.a;
   if(a==='pay'){
     const c=l.cuotas[+b.dataset.i];if(!c)return;
-    if(c.pagado)ask('¿Seguro que quieres desmarcar este pago de '+l.persona+' ('+fmt(c.monto)+')? Volverá a figurar como pendiente.',()=>{c.pagado=false;put(l);render();},true);
-    else{c.pagado=true;put(l);render();}
+    if(c.pagado)ask('¿Seguro que quieres desmarcar este pago de '+l.persona+' ('+fmt(c.monto)+')? Volverá a figurar como pendiente.',()=>{c.pagado=false;delete c.fpagado;put(l);render();},true);
+    else{c.pagado=true;c.fpagado=today;put(l);render();}
   }
   if(a==='edit')startEdit(l);
   if(a==='share')shareLoan(l);
@@ -366,6 +385,48 @@ $('bkSet').onclick=()=>{
     ask('¿Restaurar este respaldo? Reemplazará todos los préstamos actuales.',()=>{replaceAll(d);$('bk').value='';},true);
   }catch(e){$('bk').value='';$('bk').placeholder='Respaldo no válido';}
 };
+
+/* ---------- Reporte mensual ---------- */
+let rpM=today.slice(0,7);
+const mParts=k=>k.split('-').map(Number);
+function monthLbl(k){const[y,m]=mParts(k);const s=new Date(y,m-1,1).toLocaleDateString('es-PE',{month:'long',year:'numeric'});return s.charAt(0).toUpperCase()+s.slice(1);}
+function monthShort(k){const[y,m]=mParts(k);return new Date(y,m-1,1).toLocaleDateString('es-PE',{month:'short'}).replace('.','');}
+function shiftM(k,d){const[y,m]=mParts(k);const t=new Date(y,m-1+d,1);return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0');}
+const fk=n=>n>=1000?(Math.round(n/100)/10).toString().replace(/\.0$/,'')+'k':String(Math.round(n));
+function renderReport(){
+  const S={},z={pre:0,n:0,cob:0,gan:0,por:0,ven:0};
+  const g=k=>S[k]||(S[k]={pre:0,n:0,cob:0,gan:0,por:0,ven:0});
+  loans.forEach(l=>{
+    const gr=l.total?(l.total-l.monto)/l.total:0;
+    const a=g(l.fprestamo.slice(0,7));a.pre+=l.monto;a.n++;
+    l.cuotas.forEach(c=>{
+      if(c.pagado){const b=g((c.fpagado||c.fecha).slice(0,7));b.cob+=c.monto;b.gan+=c.monto*gr;}
+      else{const b=g(c.fecha.slice(0,7));b.por+=c.monto;if(c.fecha<today)b.ven+=c.monto;}
+    });
+  });
+  const cur=S[rpM]||z,months=[];
+  for(let i=5;i>=0;i--)months.push(shiftM(rpM,-i));
+  const mx=Math.max(1,...months.map(k=>Math.max((S[k]||z).pre,(S[k]||z).cob)));
+  const bars=months.map(k=>{
+    const s=S[k]||z;
+    return '<div class="bg"><div class="bb"><div class="bx"><span class="bv">'+(s.pre?fk(s.pre):'')+'</span><i style="height:'+Math.round(s.pre/mx*90)+'px;background:var(--ac)"></i></div>'+
+      '<div class="bx"><span class="bv">'+(s.cob?fk(s.cob):'')+'</span><i style="height:'+Math.round(s.cob/mx*90)+'px;background:#5cc28a"></i></div></div>'+
+      '<div class="bl'+(k===rpM?' on':'')+'">'+monthShort(k)+'</div></div>';
+  }).join('');
+  const rc=(cl,k,v,s)=>'<div class="rc '+cl+'"><div class="k">'+k+'</div><div class="v">'+v+'</div>'+(s?'<div class="s">'+s+'</div>':'')+'</div>';
+  $('rpB').innerHTML=
+    '<div class="rpn"><button class="sm" data-m="-1">◀</button><b>'+monthLbl(rpM)+'</b><button class="sm" data-m="1">▶</button></div>'+
+    '<div class="grid rpg">'+
+      rc('l','Prestado',fmt(cur.pre),cur.n?cur.n+(cur.n===1?' préstamo nuevo':' préstamos nuevos'):'')+
+      rc('g','Cobrado',fmt(cur.cob))+
+      rc('y','Ganancia cobrada',fmt(cur.gan))+
+      rc('b','Por cobrar',fmt(cur.por),cur.ven>0?'Vencido: '+fmt(cur.ven):'')+
+    '</div>'+
+    '<div class="meta"><b>Últimos 6 meses</b></div><div class="chart">'+bars+'</div>'+
+    '<div class="lg"><i style="background:var(--ac)"></i>Prestado<i style="background:#5cc28a"></i>Cobrado</div>'+
+    '<div class="meta" style="margin-top:8px">Los pagos marcados antes de esta función se cuentan en su fecha de vencimiento.</div>';
+}
+$('rpB').addEventListener('click',e=>{const b=e.target.closest('button[data-m]');if(!b)return;rpM=shiftM(rpM,+b.dataset.m);renderReport();});
 
 /* ---------- Imagen del detalle ---------- */
 const FNT='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';
@@ -450,7 +511,7 @@ function render(){
   $('sPre').textContent=fmt(pre);$('sPor').textContent=fmt(por);$('sCob').textContent=fmt(cob);$('sVen').textContent=fmt(ven);
   $('sGan').textContent=fmt(gan);$('sGanC').textContent=fmt(ganC);
   if(!ready){const m=errState?'Sin conexión con Firebase. Recarga la página.':'Cargando…';$('wkL').innerHTML='<div class="empty">'+m+'</div>';$('list').innerHTML='<div class="card empty">'+m+'</div>';return;}
-  weekly();
+  weekly();renderReport();
 
   let list=loans.filter(l=>(tab==='todos'||(tab==='pag'?done(l):!done(l)))&&(!q||l.persona.toLowerCase().includes(q)));
   const nextDue=l=>(l.cuotas.find(c=>!c.pagado)||{fecha:'9999'}).fecha;
